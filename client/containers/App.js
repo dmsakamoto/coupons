@@ -20,7 +20,13 @@ class App extends React.Component {
     return fetch(API_BASE, {
       method: 'get',
       credentials: 'same-origin',
-    }).then(response => {return response.json()});
+    }).then((response) => {
+      return response.json()
+    }).then((json) => {
+      this.setState({
+        'coupons': json
+      });
+    });
   }
 
   createNewCoupon(coupon) {
@@ -32,16 +38,16 @@ class App extends React.Component {
         'Content-Type': 'application/json'
       },
       body: coupon
-    }).then(
-      response => {
-        let coupons = this.state.coupons;
-        coupons.push(response);
-        this.setState({
-          'coupons': coupons
-        });
-        console.log("Created a new coupon:", JSON.stringify(response, 2));
-      }
-    )
+    }).then((response) => {
+      return response.json();
+    }).then((json) => {
+      coupon['code'] = json.code;
+      let coupons = this.state.coupons;
+      coupons.push(coupon);
+      this.setState({
+        'coupons': coupons
+      })
+    })
   }
 
   render() {

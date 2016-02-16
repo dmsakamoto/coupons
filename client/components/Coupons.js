@@ -2,8 +2,30 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 class Coupons extends React.Component{
+
+  renderCoupons(coupons){
+    let key = 0;
+    return coupons.map((c) => {
+      let value = '';
+      if (c.discount_type === 'fixed_amount') {
+        value = '$' + coupon.value + ' off';
+      } else if (c.discount_type === 'percentage') {
+        value = c.value + '% off'
+      }
+      let minimum = '$' + c.minimum_order_amount;
+      return (
+        <tr key={key++}>
+          <td>{c.code}</td>
+          <td>{value}</td>
+          <td>{minimum}</td>
+        </tr>
+      );
+    });
+  }
+
   render() {
     let coupons = this.props.coupons;
+    let couponsTable = this.renderCoupons(this.props.coupons);
     console.log('Coupons props', coupons);
     let i = 0;
     return (
@@ -17,40 +39,13 @@ class Coupons extends React.Component{
             </tr>
           </thead>
           <tbody>
-            {coupons.map((coupon) => {
-              <Coupon coupon={coupon} key={i++} />
-            })}
+            {couponsTable}
           </tbody>
         </table>
       </div>
     );
   }
 }
-
-class Coupon extends React.Component{
-  render() {
-    let coupon = this.props.coupon;
-    console.log('coupon', coupon);
-    let value = '';
-    if (coupon.discount_type === 'fixed_amount') {
-      value = '$' + coupon.value + ' off';
-    } else if (coupon.discount_type === 'percentage') {
-      value = coupon.value + '% off'
-    }
-    let minimum = '$' + coupon.minimum_order_amount;
-    if (parseInt(coupon.minimum_order_amount) === 0){
-      minimum = 'any amount';
-    }
-    return (
-      <tr key={this.props.key}>
-        <td>{coupon.code}</td>
-        <td>{value}</td>
-        <td>{minimum}</td>
-      </tr>
-    )
-  }
-}
-
 
 
 export default Coupons;
