@@ -32,6 +32,7 @@
     "react-redux": "^4.4.0",
     "redux": "^3.3.1",
     "redux-thunk": "^1.0.3",
+    "shopify-node-api": "^1.6.1",
     "url": "^0.11.0"
   },
   "devDependencies": {

@@ -7,11 +7,22 @@ let url = require('url');
 let httpProxy = require('http-proxy');
 let fetch = require('isomorphic-fetch');
 let path = require('path');
+let shopifyAPI = require('shopify-node-api');
 
-// This access token is incorrect
-// let accessToken = require('../../config/secrets').accessToken;
+let Shopify = new shopifyAPI({
+  'shop': 'dereks-bizzy-store-2',
+  'shopify_api_key': '90f6b4fe845459d50ff024529d4ae8de',
+  'access_token': 'b2f348ae2b78d7acc92e2d1a08e7edcb'
+});
 
-const SHOPIFY_API_ENDPOINT = 'http://dereks-bizzy-store-2.myshopify.com/admin/'
+let _coupons = {};
+
+// set initial data
+try {
+  _coupons = require('../../data/coupons.json') || {};
+} catch(e) {
+  _coupons = {};
+}
 
 function generateRandomString() {
   let letters = ['a', 'b', 'c', 'd', 'e', 'f'];
@@ -22,97 +33,53 @@ function generateRandomString() {
   return str;
 }
 
+// router.route('/')
+//   .get(function (req, res){
+//     console.log('GET', req.baseUrl);
+//     res.json({ 'ok': true} )
+//   })
+//   .post(function (req, res){
+//     let coupon = req.body;
+//     coupon.code = generateRandomString();
+//     res.json(coupon);
+//   });
 
 router.route('/')
   .get(function (req, res){
-    console.log('GET', req.baseUrl);
-    res.json({ 'ok': true} )
+    Shopify.get('/admin/discounts.json', function(err, data, headers) {
+      res.json(data);
+    });
   })
   .post(function (req, res){
-    let coupon = req.body;
-    coupon.code = generateRandomString();
-    res.json(coupon);
+    Shopify.post('/admin/discounts.json', req.body, function(err, data, headers) {
+      res.json(data);
+    });
   });
 
-/* NOTE: Did not get Auth set up with Shopify
-  router.route('/')
-    .get(function (req, res){
-      console.log('GET', req.baseUrl);
-      fetch(SHOPIFY_API_ENDPOINT + 'devices.json', {
-        method: 'get',
-        headers: {
-          'X-Shopify-Access-Token': accessToken,
-        }
-      })
-        .then(response => { return response.json(); })
-        .then(json => res.json(json))
-        .catch(reason => console.log('Catch', reason));
+router.route('/:id')
+  .get(function(req, res) {
+    Shopify.get('/' + req.params.id + '.json', function(err, data, headers) {
+      res.json(data);
+    });
+  })
+  .delete(function (req, res) {
+    Shopify.delete('/' + req.params.id + '.json', function(err, data, headers) {
+      res.json(data);
     })
-    .post(function (req, res){
-      console.log('POST', req.baseUrl);
-      fetch(SHOPIFY_API_ENDPOINT + 'devices.json', {
-        method: 'post',
-        headers: {
-          'X-Shopify-Access-Token': accessToken,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(response => { return response.json(); })
-        .then(json => res.json(json))
-        .catch(reason => console.log('Catch', reason));
-    });
+  });
 
-  router.route('/:id')
-    .get(function(req, res) {
-      fetch(SHOPIFY_API_ENDPOINT + req.params.id + '.json', {
-        method: 'get',
-        headers: {
-          'X-Shopify-Access-Token': accessToken,
-        }
-      })
-        .then(response => { return response.json(); })
-        .then(json => res.json(json))
-        .catch(reason => console.log('Catch', reason));
+router.route('/:id/enable')
+  .get(function(req, res) {
+    Shopify.get('/' + this.params.id + '/enable.json', function(err, data, headers) {
+      res.send(data);
     })
-    .delete(function (req, res) {
-      fetch(SHOPIFY_API_ENDPOINT + req.params.id + '.json', {
-        method: 'delete',
-        headers: {
-          'X-Shopify-Access-Token': accessToken,
-        }
-      })
-        .then(response => { return response.json(); })
-        .then(json => res.json(json))
-        .catch(reason => console.log('Catch', reason));
-    });
-
-  router.route('/:id/enable')
-    .get(function(req, res) {
-      fetch(SHOPIFY_API_ENDPOINT + req.params.id + '/enable.json', {
-        method: 'get',
-        headers: {
-          'X-Shopify-Access-Token': accessToken,
-        }
-      })
-        .then(response => { return response.json(); })
-        .then(json => res.json(json))
-        .catch(reason => console.log('Catch', reason));
-    });
+  });
 
   router.route('/:id/disable')
     .get(function(req, res) {
-      fetch(SHOPIFY_API_ENDPOINT + req.params.id + '/disable.json', {
-        method: 'get',
-        headers: {
-          'X-Shopify-Access-Token': accessToken,
-        }
+      Shopify.get('/' + this.params.id + '/disable.json', function(err, data, headers) {
+        res.send(data);
       })
-        .then(response => { return response.json(); })
-        .then(json => res.json(json))
-        .catch(reason => console.log('Catch', reason));
     });
-*/
-
 
 module.exports = router;

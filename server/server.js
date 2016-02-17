@@ -22,7 +22,8 @@ let compiler = webpack(webpackConfig);
 app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: webpackConfig.output.publicPath }));
 app.use(webpackHotMiddleware(compiler));
 
-/* Did not get Auth set up with Shopify
+/*
+  // Did not get Auth set up with Shopify
   app.use(session({
   'secret': 'session secret',
   'resave': false,
